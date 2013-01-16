@@ -1,0 +1,84 @@
+#!/usr/bin/env ruby
+=begin
+Copyright (c) 2013 Dominik Elsbroek
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of 
+this software and associated documentation files (the "Software"), to deal in 
+the Software without restriction, including without limitation the rights to 
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies 
+of the Software, and to permit persons to whom the Software is furnished to do 
+so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all 
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
+THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE 
+SOFTWARE.
+=end
+
+require 'io/console'
+require 'optparse'
+require 'rest_client'
+require_relative '../lib/jira.rb'
+
+options = {}
+option_parser = OptionParser.new do |opts|
+  opts.banner = "Usage: JiRC [options]\nif no password is provided, user will be ask to enter password\n"
+
+  opts.on("-h", "--host <jira hostname>", "hostname") do |host|
+    options[:host] = host
+  end
+  opts.on("-u", "--user <jira username>", "username") do |usr|
+    options[:user] = usr
+  end
+  opts.on("-w", "--password <jira password>", "password") do |passwd|
+    options[:pass] = passwd
+  end
+  opts.on("-p", "--project <project name>", "project identifier") do |var|
+    options[:project] = var
+  end
+  opts.on("-a", "--affected-version <affected version>", "affected version (sprint identifier)") do |var|
+    options[:affectedVersion] = var
+  end
+  opts.on("-i", "--issue-type <issue type>", "issue type to search for, e.g. story") do |var|
+    options[:issuetype] = var
+  end
+  opts.on("-m", "--maximum_results <max results>", "maximum number of results") do |var|
+    options[:maxResults] = var
+  end
+  opts.on("-v", "--verbose", "verbose output") do |verbose|
+    options[:verbose] = verbose
+  end
+  if options[:host].nil? || options[:user].nil? || options[:project].nil?
+    puts opts
+    exit -1
+  end  
+end.parse!
+
+#Now raise an exception if we have not found a host optio
+
+
+# The only parameter that needs escaping (future version should use an array)
+unless options[:affectedVersion].nil?
+  options[:affectedVersion] = "%22#{options[:affectedVersion]}%22"
+end
+
+if options[:password].nil?
+  puts "enter password for user #{options[:user]}"
+  options[:pass] = STDIN.noecho(&:gets).strip
+end
+
+begin
+  puts JSON.parse(Jira::Search::search(options))
+rescue RestClient::Unauthorized
+  puts "401 unauthorized. username/password wrong"
+rescue RestClient::Unauthorized    
+  puts "forbidden (captcha needed?)"
+end
+
+
