@@ -1,11 +1,12 @@
 
 Simple JIra Restful Client.
-Type ./bin/JiRC -h for help.
 
-Currently only search is supporded with a limited set parameters. 
+Run ./bin/JiRC for help and parameter list.
+
+Currently searching is supporded only with a limited set parameters. 
 
 Any forks and extentions are very welcome!
 
-This software has been tested with ruby 1.9.3.
+This software has been tested with ruby 1.9.3 only.
 
-Please use bundler to install required gems.
+Run bundler to install required gems.
