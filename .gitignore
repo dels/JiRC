@@ -5,3 +5,4 @@
 config
 lib/models/config/*.yml
 Gemfile.lock
+*.json

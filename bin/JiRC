@@ -51,6 +51,9 @@ option_parser = OptionParser.new do |opts|
   opts.on("-m", "--maximum_results <max results>", "maximum number of results") do |var|
     options[:maxResults] = var
   end
+  opts.on("-o", "--output <output file>", "write output to file") do |var|
+    options[:output_file] = var
+  end
   opts.on("-v", "--verbose", "verbose output") do |verbose|
     options[:verbose] = verbose
   end
@@ -78,11 +81,20 @@ if options[:password].nil?
 end
 
 begin
-  puts JSON.pretty_generate(JSON.parse(Jira::Search::search(options)))
+  res = JSON.pretty_generate(JSON.parse(Jira::Search::search(options)))
 rescue RestClient::Unauthorized
   puts "401 unauthorized. username/password wrong"
+  exit -1
 rescue RestClient::Unauthorized    
   puts "forbidden (captcha needed?)"
+  exit -1
 end
 
+if options[:output_file].nil?
+  puts res
+  exit 0
+end
 
+File.open(options[:output_file], 'w') do |f|
+  f.puts res 
+end
