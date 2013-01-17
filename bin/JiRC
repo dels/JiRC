@@ -28,7 +28,7 @@ require_relative '../lib/jira.rb'
 
 options = {}
 option_parser = OptionParser.new do |opts|
-  opts.banner = "Usage: JiRC [options]\nif no password is provided, user will be ask to enter password"
+  opts.banner = "Usage: #{File.basename($0)} [options]\nif no password is provided, user will be ask to enter password"
 
   opts.on("-h", "--host <jira hostname>", "hostname") do |host|
     options[:host] = host
@@ -54,12 +54,15 @@ option_parser = OptionParser.new do |opts|
   opts.on("-v", "--verbose", "verbose output") do |verbose|
     options[:verbose] = verbose
   end
+  @opts = opts
 end.parse!
 
 if options[:host].nil? || options[:user].nil? || options[:project].nil?
   puts 'host parameter is mandatory' if options[:host].nil?
   puts 'user parameter is mandatory' if options[:user].nil?
   puts 'project parameter is mandatory' if options[:project].nil?
+  puts "\n"
+  puts @opts
   exit -1
 end  
 
@@ -75,7 +78,7 @@ if options[:password].nil?
 end
 
 begin
-  puts JSON.parse(Jira::Search::search(options))
+  puts JSON.pretty_generate(JSON.parse(Jira::Search::search(options)))
 rescue RestClient::Unauthorized
   puts "401 unauthorized. username/password wrong"
 rescue RestClient::Unauthorized    
