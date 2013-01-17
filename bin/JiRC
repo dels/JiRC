@@ -28,7 +28,7 @@ require_relative '../lib/jira.rb'
 
 options = {}
 option_parser = OptionParser.new do |opts|
-  opts.banner = "Usage: JiRC [options]\nif no password is provided, user will be ask to enter password\n"
+  opts.banner = "Usage: JiRC [options]\nif no password is provided, user will be ask to enter password"
 
   opts.on("-h", "--host <jira hostname>", "hostname") do |host|
     options[:host] = host
@@ -54,13 +54,14 @@ option_parser = OptionParser.new do |opts|
   opts.on("-v", "--verbose", "verbose output") do |verbose|
     options[:verbose] = verbose
   end
-  if options[:host].nil? || options[:user].nil? || options[:project].nil?
-    puts opts
-    exit -1
-  end  
 end.parse!
 
-#Now raise an exception if we have not found a host optio
+if options[:host].nil? || options[:user].nil? || options[:project].nil?
+  puts 'host parameter is mandatory' if options[:host].nil?
+  puts 'user parameter is mandatory' if options[:user].nil?
+  puts 'project parameter is mandatory' if options[:project].nil?
+  exit -1
+end  
 
 
 # The only parameter that needs escaping (future version should use an array)
