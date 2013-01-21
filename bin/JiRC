@@ -69,12 +69,6 @@ if options[:host].nil? || options[:user].nil? || options[:project].nil?
   exit -1
 end  
 
-
-# The only parameter that needs escaping (future version should use an array)
-unless options[:affectedVersion].nil?
-  options[:affectedVersion] = "%22#{options[:affectedVersion]}%22"
-end
-
 if options[:password].nil?
   puts "enter password for user #{options[:user]}"
   options[:pass] = STDIN.noecho(&:gets).strip

@@ -29,10 +29,13 @@ module Jira
     SEARCH_PATH = '/rest/api/latest/search.json'
     KEYS = %w|project issuetype affectedVersion assignee|
     # if we don't have symbols here options can't be checked for search parameters
-    OPTIONS = %w|startAt maxResults|.map{|elem| elem.to_sym}
-      
+    OPTIONS = %w|startAt maxResults expand|.map{|elem| elem.to_sym}
 
     def self.search(opts = {})
+      # The only parameter that needs escaping (future version should use an array)
+      unless opts[:affectedVersion].nil?
+        opts[:affectedVersion] = "%22#{opts[:affectedVersion]}%22"
+      end
       query = ""
       KEYS.each do |var|
         if opts[var.to_sym]
@@ -50,7 +53,9 @@ module Jira
           end
         end
       end
-      puts "requesting: #{opts[:host]}#{SEARCH_PATH}?jql=#{query}" if opts[:verbose]
+      opts[:logger].debug "requesting: #{opts[:host]}#{SEARCH_PATH}?jql=#{query}" unless opts[:logger].nil?
+      "requesting: #{opts[:host]}#{SEARCH_PATH}?jql=#{query}" if opts[:logger].nil? && opts[:debug]
+
       # FIXME: if the user or password contains any characters that could break 
       # authentification, such as a colon, they will break authentification here!
       RestClient::Resource.new("#{opts[:host]}#{SEARCH_PATH}?jql=#{query}", opts[:user], opts[:pass]).get(:content_type => 'application/json')
