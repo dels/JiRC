@@ -24,6 +24,41 @@ require 'json'
 
 module Jira
   
+  class Fetch
+
+    API_PREFIX = "/rest/api/2"
+    PROJECT_PREFIX = "project"
+
+
+    def self.project_data(opts = {})
+      uri = "#{opts[:host]}#{API_PREFIX}/#{PROJECT_PREFIX}/#{opts[:project_key]}"
+      execute_and_log_request_request(opts, uri)
+    end
+
+    def self.project_versions(opts = {})
+      uri = "#{opts[:host]}#{API_PREFIX}/#{PROJECT_PREFIX}/#{opts[:project_key]}/versions"
+      uri << "?expand" if opts[:expand]
+      execute_and_log_request_request(opts, uri)
+    end
+
+    def self.version(opts = {})
+      uri = "#{opts[:host]}#{API_PREFIX}#{VERSION_PREFIX}/#{opts[:version]}"
+      execute_and_log_request_request(opts, uri)
+    end
+
+    private 
+    def self.execute_and_log_request_request(opts, req_path)
+      opts[:logger].debug "requesting: #{req_path}" unless opts[:logger].nil?
+      puts "requesting: #{req_path}" if opts[:verbose]
+
+
+      # FIXME: if the user or password contains any characters that could break 
+      # authentification, such as a colon, they will break authentification here!
+      RestClient::Resource.new(req_path, opts[:user], opts[:pass]).get(:content_type => 'application/json')               
+    end
+
+  end
+
   class Search
 
     SEARCH_PATH = '/rest/api/latest/search.json'
@@ -54,7 +89,7 @@ module Jira
         end
       end
       opts[:logger].debug "requesting: #{opts[:host]}#{SEARCH_PATH}?jql=#{query}" unless opts[:logger].nil?
-      "requesting: #{opts[:host]}#{SEARCH_PATH}?jql=#{query}" if opts[:logger].nil? && opts[:debug]
+      "requesting: #{opts[:host]}#{SEARCH_PATH}?jql=#{query}" if opts[:logger].nil? && opts[:verbose]
 
       # FIXME: if the user or password contains any characters that could break 
       # authentification, such as a colon, they will break authentification here!

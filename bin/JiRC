@@ -60,10 +60,9 @@ option_parser = OptionParser.new do |opts|
   @opts = opts
 end.parse!
 
-if options[:host].nil? || options[:user].nil? || options[:project].nil?
+if options[:host].nil? || options[:user].nil?
   puts 'host parameter is mandatory' if options[:host].nil?
   puts 'user parameter is mandatory' if options[:user].nil?
-  puts 'project parameter is mandatory' if options[:project].nil?
   puts "\n"
   puts @opts
   exit -1
