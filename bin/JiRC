@@ -45,6 +45,9 @@ option_parser = OptionParser.new do |opts|
   opts.on("-a", "--affected-version <affected version>", "affected version (sprint identifier)") do |var|
     options[:affectedVersion] = var
   end
+  opts.on("-f", "--fix-version <fix version>", "fix version (sprint identifier)") do |var|
+    options[:fixVersion] = var
+  end
   opts.on("-i", "--issue-type <issue type>", "issue type to search for, e.g. story") do |var|
     options[:issuetype] = var
   end
